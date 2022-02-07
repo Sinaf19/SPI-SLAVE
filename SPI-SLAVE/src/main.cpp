@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include 
 
 
 // SLAVE code
@@ -15,7 +14,7 @@ int data;
 void setup()
 {
   // Setup pour que le SPI fonctionne correctement avec slmt un bouton qui envoie info au master et une led pour dire que l'info du master a bien été reçue
-  Serial.begin(19200);
+  Serial.begin(9600);
   SPI.begin();
   pinMode(LED, OUTPUT);
   pinMode(button, INPUT);
@@ -35,6 +34,7 @@ void loop()
   if (buttonValue)
   {
     data = 85;
+    Serial.println("Appuyé");
   }
   else
   {
