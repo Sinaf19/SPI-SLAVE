@@ -34,7 +34,7 @@
 #define button 26
 
 int pot = A8;
-int x;
+int x = 0;
 int mode;
 int buttonValue;
 
@@ -74,7 +74,7 @@ void loop()
   bool ss1 = digitalRead(SS);
   bool ss2 = digitalRead(SS2);
 
-  if (button)
+  if (buttonValue)
   {
     x = 1;
     Serial.println("ENVOIE DE X = 1");
@@ -88,9 +88,9 @@ void loop()
   digitalWrite(SS, LOW);
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
-  Serial.println(Mastereceive);
+  //Serial.println(Mastereceive);
 
-  if (Mastereceive)
+  if (Mastereceive == 85)
   {
     digitalWrite(LED, HIGH);
   }
