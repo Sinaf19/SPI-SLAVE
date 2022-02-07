@@ -19,8 +19,6 @@ void setup()
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
   pinMode(SS, INPUT_PULLUP);
-
-  
 }
 
 void loop()
@@ -29,8 +27,6 @@ void loop()
   SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
 
   buttonValue = digitalRead(button);
-
-  Slavesend = data;
 
   if (buttonValue)
   {
@@ -41,7 +37,12 @@ void loop()
     data = 0;
   }
 
+  Slavesend = data;
   Slavereceived = SPI.transfer(Slavesend);
+
+  Serial.println(MISO);
+  Serial.println(Slavesend);
+  // Serial.println(Slavereceived);
 
   if (Slavereceived == 1)
   {
