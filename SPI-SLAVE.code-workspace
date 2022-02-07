@@ -10,6 +10,10 @@
 		{
 			"name": "SPI-MASTER",
 			"path": "SPI-MASTER"
+		},
+		{
+			"name": "MaBite",
+			"path": "C:\\Users\\Rafael.DOUSSE\\Documents\\PlatformIO\\Projects\\MaBite"
 		}
 	],
 	"settings": {}
