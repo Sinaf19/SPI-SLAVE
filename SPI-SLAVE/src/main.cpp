@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 
-//Slave code
+//SLAVE code
 
 
 void setup() {

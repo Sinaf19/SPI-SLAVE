@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
+//MASTER Arduino 
 
-//It is the master arduino
 void setup() {
   // put your setup code here, to run once:
 }
