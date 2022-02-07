@@ -1,11 +1,14 @@
 #include <Arduino.h>
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+
 
 //MASTER Arduino 
 
 void setup() {
   // put your setup code here, to run once:
 
- int adsfoiwaehfoih;
+
 }
 
 void loop() {
