@@ -13,6 +13,8 @@ int buttonValue;
 volatile byte Slavereceived;
 volatile byte Slavesend;
 int data;
+int datat;
+int datah;
 int humidity;
 
 void setup()
@@ -63,32 +65,32 @@ void loop()
   //Si reçoit un 2 du MASTER envoie la température
   if (Slavereceived == 2)
   {
-    data = dht.readTemperature();
+    datat = dht.readTemperature();
     Serial.print("Température :");
     Serial.println(data);
   }
   else
   {
-    data = 0;
+    datat = 0;
   }
 
 //Envoie la température
-  Slavesend = data;
+  Slavesend = datat;
   Slavereceived = SPI.transfer(Slavesend);
 
 //Si reçoit 3 du MASTER envoie l'humidité
   if (Slavereceived == 3)
   {
-    data = dht.readHumidity();
+    datah = dht.readHumidity();
     Serial.print("Humidité :");
     Serial.println(data);
   }
   else
   {
-    data = 0;
+    datah = 0;
   }
 //Envoie l'humiodité
-  Slavesend = data;
+  Slavesend = datah;
   Slavereceived = SPI.transfer(Slavesend);
 
   Serial.println(Slavereceived);
