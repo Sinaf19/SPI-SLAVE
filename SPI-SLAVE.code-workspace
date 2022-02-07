@@ -6,6 +6,10 @@
 		{
 			"name": "SPI-SLAVE",
 			"path": "SPI-SLAVE"
+		},
+		{
+			"name": "SPI-MASTER",
+			"path": "SPI-MASTER"
 		}
 	],
 	"settings": {}
