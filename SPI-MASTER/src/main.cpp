@@ -5,7 +5,6 @@
 #include <Wire.h>
 #include <Adafruit_BusIO_Register.h>
 
-
 // MASTER Arduino
 
 // Screen dimensions
@@ -32,11 +31,17 @@
 
 #define LED 7
 #define button 26
+#define button2 40
+#define button3 42
+#define LEDSwitch1 3
+#define LEDSwitch2 4
 
 int pot = A8;
 int x = 0;
 int mode;
-int buttonValue;
+int buttonValue1;
+int buttonValue2;
+int buttonValue3;
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -51,44 +56,71 @@ void setup()
 
   pinMode(button, INPUT);
   pinMode(LED, OUTPUT);
+  pinMode(LEDSwitch1, OUTPUT);
+  pinMode(LEDSwitch2, OUTPUT);
   pinMode(SS2, OUTPUT);
+  /*   pinMode(MISO, INPUT);
+    pinMode(SS, OUTPUT); */
 
-  digitalWrite(SS, HIGH);
-  digitalWrite(SS2, HIGH);
-  SPI.setClockDivider(SPI_CLOCK_DIV128);
+  //  digitalWrite(SS, HIGH);
+  //  digitalWrite(SS2, HIGH);
+  // SPI.setClockDivider(SPI_CLOCK_DIV128);
 
   tft.fillScreen(BLACK);
   tft.setCursor(0, 50);
   tft.setTextColor(WHITE);
   tft.setTextSize(1);
   tft.println("Initialisation");
-  tft.fillScreen(BLACK);
+  // tft.fillScreen(BLACK);
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-  byte Mastersend, Mastereceive;
-  buttonValue = digitalRead(button);
-  int potentiometre = analogRead(pot);
-  bool ss1 = digitalRead(SS);
-  bool ss2 = digitalRead(SS2);
 
-  if (buttonValue)
-  {
-    x = 1;
-    Serial.println("ENVOIE DE X = 1");
-  }
-  else
+  SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
+  // put your main code here, to run repeatedly:
+  volatile byte Mastersend, Mastereceive;
+  buttonValue1 = digitalRead(button);
+  buttonValue2 = digitalRead(button2);
+  buttonValue3 = digitalRead(button3);
+  /* int potentiometre = analogRead(pot);
+  bool ss1 = digitalRead(SS);
+  bool ss2 = digitalRead(SS2); */
+
+  if (buttonValue1 == HIGH and buttonValue2 == HIGH)
   {
     x = 0;
-    Serial.println("X = 0");
+    digitalWrite(LEDSwitch1, LOW);
+    digitalWrite(LEDSwitch2, LOW);
+  }
+  else if (buttonValue1)
+  {
+    x = 1;
+    
+  }
+  else if (buttonValue2)
+  {
+    x = 2;
+    digitalWrite(LEDSwitch1, HIGH);
+  }
+  else if (buttonValue3)
+  {
+    x = 3;
+    digitalWrite(LEDSwitch2, HIGH);
+  } else
+  { 
+    x = 0;
+    digitalWrite(LEDSwitch1, LOW);
+    digitalWrite(LEDSwitch2, LOW);
   }
 
   digitalWrite(SS, LOW);
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
-  //Serial.println(Mastereceive);
+  Serial.print("Mastereceive : ");
+  Serial.println(Mastereceive);
+  Serial.print("Mastersend : ");
+  Serial.println(Mastersend);
 
   if (Mastereceive == 85)
   {
@@ -98,4 +130,6 @@ void loop()
   {
     digitalWrite(LED, LOW);
   }
+
+  SPI.endTransaction();
 }
