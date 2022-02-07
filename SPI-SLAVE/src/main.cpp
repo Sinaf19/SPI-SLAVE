@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-
 // SLAVE code
 #define LED 7
 #define button 22
@@ -20,11 +19,13 @@ void setup()
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
   pinMode(SS, INPUT_PULLUP);
+
+  
 }
 
 void loop()
 {
-  //Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
+  // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
   SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
 
   buttonValue = digitalRead(button);
@@ -34,7 +35,6 @@ void loop()
   if (buttonValue)
   {
     data = 85;
-    Serial.println("Appuyé");
   }
   else
   {
