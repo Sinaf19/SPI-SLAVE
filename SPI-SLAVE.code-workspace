@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "SPI-SLAVE",
+			"path": "SPI-SLAVE"
+		}
+	],
+	"settings": {}
+}
