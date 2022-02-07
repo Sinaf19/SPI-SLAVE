@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 
-Does it work ????
+//SLAVE code
 
 
 void setup() {
