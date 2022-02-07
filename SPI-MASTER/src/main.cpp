@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1351.h>
 #include <Wire.h>
+#include <Adafruit_BusIO_Register.h>
 
 
 // MASTER Arduino
@@ -35,6 +36,7 @@
 int pot = A8;
 int x;
 int mode;
+int buttonValue;
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -42,7 +44,7 @@ Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_
 void setup()
 {
   // put your setup code here, to run once:
-  Serial.begin(19200);
+  Serial.begin(9600);
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
