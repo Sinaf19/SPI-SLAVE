@@ -119,26 +119,6 @@ void loop()
     digitalWrite(LEDSwitch2, LOW);
   }
 
-  if (buttonValue4 != buttonValue4_Mem)
-  {
-    buttonValue4_Mem = buttonValue4;
-    if (buttonValue4 == 1)
-    {
-      chgmtEcran += 1;
-    }else{
-      chgmtEcran -= 1;
-    }
-  }
-
-  if (chgmtEcran >=1){
-    chgmtEcran = 1;
-  }
-
-  if (chgmtEcran <= 0){
-    chgmtEcran = 0;
-  }
-
-
   
 
   digitalWrite(SS, LOW);
@@ -149,23 +129,6 @@ void loop()
   Serial.print("Mastersend : ");
   Serial.println(Mastersend);
 
-  if (chgmtEcran == 1){
-    tft.fillScreen(RED);
-    tft.setCursor(0, 50);
-    tft.setTextSize(2);
-    tft.setTextColor(WHITE);
-    tft.print("Temperature :");
-    tft.print(Mastereceive);
-  }
-
-   if (chgmtEcran == 0){
-    tft.fillScreen(BLUE);
-    tft.setCursor(0, 50);
-    tft.setTextSize(2);
-    tft.setTextColor(WHITE);
-    tft.print("Humidity :");
-    tft.print(Mastereceive);
-  }
 
   if (Mastereceive == 85)
   {
