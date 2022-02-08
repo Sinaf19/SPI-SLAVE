@@ -45,7 +45,11 @@ int buttonValue2;
 int buttonValue3;
 int buttonValue4;
 int buttonValue4_Mem;
+int buttonValue3_Mem;
 int chgmtEcran;
+int chgmtEcranh;
+bool ecranFlag = true;
+bool ecranFlagh = true;
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -119,7 +123,33 @@ void loop()
     digitalWrite(LEDSwitch2, LOW);
   }
 
-  
+  if (buttonValue4 != buttonValue4_Mem)
+  {
+    
+    buttonValue4_Mem = buttonValue4;
+    if (buttonValue4 == 1)
+    {
+      chgmtEcran = 1;
+      ecranFlag = true;
+    }
+  }
+
+  if (buttonValue4 == 1)
+  {
+    x = 2;
+  }
+
+  if (buttonValue3 != buttonValue3_Mem)
+  {
+    
+    buttonValue3_Mem = buttonValue3;
+    if (buttonValue3 == 1)
+    {
+      chgmtEcranh = 1;
+      ecranFlagh = true;
+    }
+  }
+
 
   digitalWrite(SS, LOW);
   Mastersend = x;
@@ -128,6 +158,42 @@ void loop()
   Serial.println(Mastereceive);
   Serial.print("Mastersend : ");
   Serial.println(Mastersend);
+
+
+if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
+{
+  tft.fillScreen(RED);
+  tft.setCursor(0, 55);
+  tft.setTextSize(1);
+  tft.setTextColor(WHITE);
+  tft.print("Temperature : ");
+  
+  tft.println(Mastereceive);
+  ecranFlag = false;
+}else if (chgmtEcran == 0 and ecranFlag == true){
+  tft.fillScreen(BLACK);
+  ecranFlag = false;
+}
+
+if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 10)
+{
+  tft.fillScreen(BLUE);
+  tft.setCursor(0, 55);
+  tft.setTextSize(1);
+  tft.setTextColor(WHITE);
+  tft.print("Humidity : ");
+    tft.println(Mastereceive);
+  ecranFlagh = false;
+}else if (chgmtEcranh == 0 and ecranFlagh == true){
+  tft.fillScreen(BLACK);
+  ecranFlagh = false;
+}
+
+
+
+
+
+
 
 
   if (Mastereceive == 85)
