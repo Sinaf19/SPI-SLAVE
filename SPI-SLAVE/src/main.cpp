@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <dht.h>
 #include <Adafruit_Sensor.h>
+#include <SD.h>
 
 // SLAVE code
 // Définition des éléments physiques
