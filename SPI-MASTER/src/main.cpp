@@ -60,7 +60,7 @@ bool ecranFlagh = true;
 Sd2Card card;
 SdVolume volume;
 SdFile root;
-const int chipSelect = 53;  
+const int chipSelect = 10;  
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -72,7 +72,8 @@ void setup()
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
-
+  
+  pinMode(chipSelect, OUTPUT);
   pinMode(button, INPUT);
   pinMode(LED, OUTPUT);
   pinMode(LEDSwitch1, OUTPUT);
@@ -82,12 +83,12 @@ void setup()
   Serial.print("\nInitializing SD card...");
   pinMode(SS, OUTPUT);
 
-/*     while (!card.init(SPI_HALF_SPEED, chipSelect)) {
+    while (!card.init(SPI_HALF_SPEED, chipSelect)) {
     Serial.println("initialization failed. Things to check:");
     Serial.println("* is a card is inserted?");
     Serial.println("* Is your wiring correct?");
     Serial.println("* did you change the chipSelect pin to match your shield or module?");
-  }  */
+  } 
   
   // print the type of card
   Serial.print("\nCard type: ");
