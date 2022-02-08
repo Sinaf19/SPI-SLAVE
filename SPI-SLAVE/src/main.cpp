@@ -36,7 +36,7 @@ void setup()
 void loop()
 {
   // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
-  SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
   buttonValue = digitalRead(button);
 
   // Si le bouton est appuyé envoie 85 au MASTER
@@ -70,7 +70,7 @@ void loop()
   {
     datat = dht.readTemperature();
     Serial.print("Température :");
-    Serial.println(data);
+    Serial.println(datat);
   }
   else
   {
@@ -88,7 +88,7 @@ void loop()
   {
     datah = dht.readHumidity();
     Serial.print("Humidité :");
-    Serial.println(data);
+    Serial.println(datah);
   }
   else
   {
