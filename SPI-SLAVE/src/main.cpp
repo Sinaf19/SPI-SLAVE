@@ -1,19 +1,18 @@
 
-//Librairies utilisées
+// Librairies utilisées
 #include <Arduino.h>
 #include <SPI.h>
 #include <dht.h>
 #include <Adafruit_Sensor.h>
 
 // SLAVE code
-//Définition des éléments physiques
+// Définition des éléments physiques
 #define LED 7
 #define button 22
 #define button2
 DHT dht(4, DHT11);
 
-
-//Définition des variables
+// Définition des variables
 int buttonValue;
 volatile byte Slavereceived;
 volatile byte Slavesend;
@@ -40,7 +39,7 @@ void loop()
   SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
   buttonValue = digitalRead(button);
 
-//Si le bouton est appuyé envoie 85 au MASTER
+  // Si le bouton est appuyé envoie 85 au MASTER
   if (buttonValue)
   {
     data = 85;
@@ -49,15 +48,14 @@ void loop()
   {
     data = 0;
   }
-  //Envoie des données et réception des data du MASTER
+  // Envoie des données et réception des data du MASTER
   Slavesend = data;
   Slavereceived = SPI.transfer(Slavesend);
 
-  
-/*   Serial.println(Slavesend);
-  Serial.println(Slavereceived); */
+  /*   Serial.println(Slavesend);
+    Serial.println(Slavereceived); */
 
-//Si le data du MASTER est de 1 --> allume une LED
+  // Si le data du MASTER est de 1 --> allume une LED
   if (Slavereceived == 1)
   {
     digitalWrite(LED, HIGH);
@@ -67,7 +65,7 @@ void loop()
     digitalWrite(LED, LOW);
   }
 
-  //Si reçoit un 2 du MASTER envoie la température
+  // Si reçoit un 2 du MASTER envoie la température
   if (Slavereceived == 2)
   {
     datat = dht.readTemperature();
@@ -79,11 +77,13 @@ void loop()
     datat = 0;
   }
 
-//Envoie la température
-  Slavesend = datat;
-  Slavereceived = SPI.transfer(Slavesend);
-
-//Si reçoit 3 du MASTER envoie l'humidité
+  // Envoie la température
+  if (datat != 0)
+  {
+    Slavesend = datat;
+    Slavereceived = SPI.transfer(Slavesend);
+  }
+  // Si reçoit 3 du MASTER envoie l'humidité
   if (Slavereceived == 3)
   {
     datah = dht.readHumidity();
@@ -94,18 +94,12 @@ void loop()
   {
     datah = 0;
   }
-//Envoie l'humiodité
-  Slavesend = datah;
-  Slavereceived = SPI.transfer(Slavesend);
-
+  // Envoie l'humiodité
+  if (datah != 0)
+  {
+    Slavesend = datah;
+    Slavereceived = SPI.transfer(Slavesend);
+  }
   Serial.println(Slavereceived);
   SPI.endTransaction();
-
-
-
-
-
-
-
-
 }
