@@ -17,7 +17,7 @@
 #define DC_PIN 34
 #define CS_PIN 35
 #define RST_PIN 36
-#define SS2 48
+#define SS2 44
 
 // Color definitions
 #define BLACK 0x0000
@@ -73,7 +73,7 @@ void setup()
   //  digitalWrite(SS, HIGH);
   //  digitalWrite(SS2, HIGH);
   // SPI.setClockDivider(SPI_CLOCK_DIV128);
-
+  
   tft.fillScreen(BLACK);
   tft.setCursor(0, 50);
   tft.setTextColor(WHITE);
@@ -84,7 +84,7 @@ void setup()
 
 void loop()
 {
-
+  
   SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
   // put your main code here, to run repeatedly:
   volatile byte Mastersend, Mastereceive;
@@ -131,6 +131,7 @@ void loop()
     {
       chgmtEcran = 1;
       ecranFlag = true;
+      Serial.println("Temperature");
     }
   }
 
@@ -167,7 +168,7 @@ if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
   tft.setTextSize(1);
   tft.setTextColor(WHITE);
   tft.print("Temperature : ");
-  
+  Serial.println("Temperature");
   tft.println(Mastereceive);
   ecranFlag = false;
 }else if (chgmtEcran == 0 and ecranFlag == true){
@@ -175,26 +176,20 @@ if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
   ecranFlag = false;
 }
 
-if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 10)
+if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 5)
 {
   tft.fillScreen(BLUE);
   tft.setCursor(0, 55);
   tft.setTextSize(1);
   tft.setTextColor(WHITE);
   tft.print("Humidity : ");
-    tft.println(Mastereceive);
+  Serial.println("Humidity");
+  tft.println(Mastereceive);
   ecranFlagh = false;
 }else if (chgmtEcranh == 0 and ecranFlagh == true){
   tft.fillScreen(BLACK);
   ecranFlagh = false;
 }
-
-
-
-
-
-
-
 
   if (Mastereceive == 85)
   {
