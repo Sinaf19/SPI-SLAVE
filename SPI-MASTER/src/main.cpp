@@ -33,6 +33,7 @@
 #define button 26
 #define button2 40
 #define button3 42
+#define button4 39
 #define LEDSwitch1 3
 #define LEDSwitch2 4
 
@@ -42,6 +43,9 @@ int mode;
 int buttonValue1;
 int buttonValue2;
 int buttonValue3;
+int buttonValue4;
+int buttonValue4_Mem;
+int chgmtEcran;
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -83,6 +87,7 @@ void loop()
   buttonValue1 = digitalRead(button);
   buttonValue2 = digitalRead(button2);
   buttonValue3 = digitalRead(button3);
+  buttonValue4 = digitalRead(button4);
   /* int potentiometre = analogRead(pot);
   bool ss1 = digitalRead(SS);
   bool ss2 = digitalRead(SS2); */
@@ -114,6 +119,28 @@ void loop()
     digitalWrite(LEDSwitch2, LOW);
   }
 
+  if (buttonValue4 != buttonValue4_Mem)
+  {
+    buttonValue4_Mem = buttonValue4;
+    if (buttonValue4 == 1)
+    {
+      chgmtEcran += 1;
+    }else{
+      chgmtEcran -= 1;
+    }
+  }
+
+  if (chgmtEcran >=1){
+    chgmtEcran = 1;
+  }
+
+  if (chgmtEcran <= 0){
+    chgmtEcran = 0;
+  }
+
+
+  
+
   digitalWrite(SS, LOW);
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
@@ -121,6 +148,24 @@ void loop()
   Serial.println(Mastereceive);
   Serial.print("Mastersend : ");
   Serial.println(Mastersend);
+
+  if (chgmtEcran == 1){
+    tft.fillScreen(RED);
+    tft.setCursor(0, 50);
+    tft.setTextSize(2);
+    tft.setTextColor(WHITE);
+    tft.print("Temperature :");
+    tft.print(Mastereceive);
+  }
+
+   if (chgmtEcran == 0){
+    tft.fillScreen(BLUE);
+    tft.setCursor(0, 50);
+    tft.setTextSize(2);
+    tft.setTextColor(WHITE);
+    tft.print("Humidity :");
+    tft.print(Mastereceive);
+  }
 
   if (Mastereceive == 85)
   {
