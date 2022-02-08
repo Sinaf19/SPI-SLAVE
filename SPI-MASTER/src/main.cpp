@@ -36,7 +36,10 @@
 #define button4 39
 #define LEDSwitch1 3
 #define LEDSwitch2 4
+#define BlueLED A4
 
+volatile byte Mastersend;
+volatile byte Mastereceive;
 int pot = A8;
 int x = 0;
 int mode;
@@ -73,7 +76,7 @@ void setup()
   //  digitalWrite(SS, HIGH);
   //  digitalWrite(SS2, HIGH);
   // SPI.setClockDivider(SPI_CLOCK_DIV128);
-  
+
   tft.fillScreen(BLACK);
   tft.setCursor(0, 50);
   tft.setTextColor(WHITE);
@@ -84,121 +87,138 @@ void setup()
 
 void loop()
 {
-  
-  SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
-  // put your main code here, to run repeatedly:
-  volatile byte Mastersend, Mastereceive;
-  buttonValue1 = digitalRead(button);
   buttonValue2 = digitalRead(button2);
-  buttonValue3 = digitalRead(button3);
-  buttonValue4 = digitalRead(button4);
-  /* int potentiometre = analogRead(pot);
-  bool ss1 = digitalRead(SS);
-  bool ss2 = digitalRead(SS2); */
+  
+    digitalWrite(SS2, HIGH);
+    SPI.beginTransaction(SPISettings(100, MSBFIRST, SPI_MODE0));
+    // put your main code here, to run repeatedly:
 
-  if (buttonValue1 == HIGH and buttonValue2 == HIGH)
-  {
-    x = 0;
-    digitalWrite(LEDSwitch1, LOW);
-    digitalWrite(LEDSwitch2, LOW);
-  }
-  else if (buttonValue1)
-  {
-    x = 1;
-    
-  }
-  else if (buttonValue2)
-  {
-    x = 2;
-    digitalWrite(LEDSwitch1, HIGH);
-  }
-  else if (buttonValue3)
-  {
-    x = 3;
-    digitalWrite(LEDSwitch2, HIGH);
-  } else
-  { 
-    x = 0;
-    digitalWrite(LEDSwitch1, LOW);
-    digitalWrite(LEDSwitch2, LOW);
-  }
+    buttonValue1 = digitalRead(button);
 
-  if (buttonValue4 != buttonValue4_Mem)
-  {
-    
-    buttonValue4_Mem = buttonValue4;
+    buttonValue3 = digitalRead(button3);
+    buttonValue4 = digitalRead(button4);
+    /* int potentiometre = analogRead(pot);
+    bool ss1 = digitalRead(SS);
+    bool ss2 = digitalRead(SS2); */
+
+    if (buttonValue1 == HIGH and buttonValue2 == HIGH)
+    {
+      x = 0;
+      digitalWrite(LEDSwitch1, LOW);
+      digitalWrite(LEDSwitch2, LOW);
+    }
+    else if (buttonValue1)
+    {
+      x = 1;
+    }
+    else if (buttonValue3)
+    {
+      x = 3;
+      digitalWrite(LEDSwitch2, HIGH);
+    }
+    else
+    {
+      x = 0;
+      digitalWrite(LEDSwitch1, LOW);
+      digitalWrite(LEDSwitch2, LOW);
+    }
+
+    if (buttonValue4 != buttonValue4_Mem)
+    {
+
+      buttonValue4_Mem = buttonValue4;
+      if (buttonValue4 == 1)
+      {
+        chgmtEcran = 1;
+        ecranFlag = true;
+        Serial.println("Temperature");
+      }
+    }
+
     if (buttonValue4 == 1)
     {
-      chgmtEcran = 1;
-      ecranFlag = true;
-      Serial.println("Temperature");
+      x = 2;
     }
-  }
 
-  if (buttonValue4 == 1)
-  {
-    x = 2;
-  }
-
-  if (buttonValue3 != buttonValue3_Mem)
-  {
-    
-    buttonValue3_Mem = buttonValue3;
-    if (buttonValue3 == 1)
+    if (buttonValue3 != buttonValue3_Mem)
     {
-      chgmtEcranh = 1;
-      ecranFlagh = true;
+
+      buttonValue3_Mem = buttonValue3;
+      if (buttonValue3 == 1)
+      {
+        chgmtEcranh = 1;
+        ecranFlagh = true;
+      }
     }
-  }
 
+    digitalWrite(SS, LOW);
+    Mastersend = x;
+    Mastereceive = SPI.transfer(Mastersend);
+    Serial.print("Mastereceive : ");
+    Serial.println(Mastereceive);
+    Serial.print("Mastersend : ");
+    Serial.println(Mastersend);
 
-  digitalWrite(SS, LOW);
-  Mastersend = x;
-  Mastereceive = SPI.transfer(Mastersend);
-  Serial.print("Mastereceive : ");
-  Serial.println(Mastereceive);
-  Serial.print("Mastersend : ");
-  Serial.println(Mastersend);
+    if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
+    {
+      tft.fillScreen(RED);
+      tft.setCursor(5, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Temperature : ");
+      Serial.println("Temperature");
+      tft.println(Mastereceive);
+      ecranFlag = false;
+    }
+    else if (chgmtEcran == 0 and ecranFlag == true)
+    {
+      tft.fillScreen(BLACK);
+      ecranFlag = false;
+    }
 
+    if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 5)
+    {
+      tft.fillScreen(BLUE);
+      tft.setCursor(5, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Humidity : ");
+      Serial.println("Humidity");
+      tft.println(Mastereceive);
+      ecranFlagh = false;
+    }
+    else if (chgmtEcranh == 0 and ecranFlagh == true)
+    {
+      tft.fillScreen(BLACK);
+      ecranFlagh = false;
+    }
 
-if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
-{
-  tft.fillScreen(RED);
-  tft.setCursor(0, 55);
-  tft.setTextSize(1);
-  tft.setTextColor(WHITE);
-  tft.print("Temperature : ");
-  Serial.println("Temperature");
-  tft.println(Mastereceive);
-  ecranFlag = false;
-}else if (chgmtEcran == 0 and ecranFlag == true){
-  tft.fillScreen(BLACK);
-  ecranFlag = false;
-}
+    if (Mastereceive == 85)
+    {
+      digitalWrite(LED, HIGH);
+    }
+    else
+    {
+      digitalWrite(LED, LOW);
+    }
 
-if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 5)
-{
-  tft.fillScreen(BLUE);
-  tft.setCursor(0, 55);
-  tft.setTextSize(1);
-  tft.setTextColor(WHITE);
-  tft.print("Humidity : ");
-  Serial.println("Humidity");
-  tft.println(Mastereceive);
-  ecranFlagh = false;
-}else if (chgmtEcranh == 0 and ecranFlagh == true){
-  tft.fillScreen(BLACK);
-  ecranFlagh = false;
-}
+    SPI.endTransaction();
+  
 
-  if (Mastereceive == 85)
+/*   if (buttonValue2 == 0)
   {
-    digitalWrite(LED, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED, LOW);
-  }
 
-  SPI.endTransaction();
+    digitalWrite(SS, HIGH);
+    digitalWrite(SS2, LOW);
+    Serial.println("In the matrix");
+    SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+
+    Mastersend = 30;
+
+    Mastersend = SPI.transfer(Mastereceive);
+    Serial.println(Mastereceive);
+    analogWrite(BlueLED, Mastereceive);
+
+    SPI.endTransaction();
+  } */
 }
