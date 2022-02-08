@@ -1,14 +1,19 @@
+
+//Librairies utilisées
 #include <Arduino.h>
 #include <SPI.h>
 #include <dht.h>
 #include <Adafruit_Sensor.h>
 
 // SLAVE code
+//Définition des éléments physiques
 #define LED 7
 #define button 22
 #define button2
 DHT dht(4, DHT11);
 
+
+//Définition des variables
 int buttonValue;
 volatile byte Slavereceived;
 volatile byte Slavesend;
