@@ -37,13 +37,14 @@ void setup()
 void loop()
 {
   // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
-  SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
   buttonValue = digitalRead(button);
 
   // Si le bouton est appuyé envoie 85 au MASTER
   if (buttonValue)
   {
     data = 85;
+  //  Serial.println(data);
   }
   else
   {
@@ -53,8 +54,6 @@ void loop()
   Slavesend = data;
   Slavereceived = SPI.transfer(Slavesend);
 
-  /*   Serial.println(Slavesend);
-    Serial.println(Slavereceived); */
 
   // Si le data du MASTER est de 1 --> allume une LED
   if (Slavereceived == 1)
@@ -66,7 +65,7 @@ void loop()
     digitalWrite(LED, LOW);
   }
 
-  // Si reçoit un 2 du MASTER envoie la température
+/*   // Si reçoit un 2 du MASTER envoie la température
   if (Slavereceived == 2)
   {
     datat = dht.readTemperature();
@@ -100,7 +99,10 @@ void loop()
   {
     Slavesend = datah;
     Slavereceived = SPI.transfer(Slavesend);
-  }
-  Serial.println(Slavereceived);
+  } */
+/*   Serial.print("Slavereceived : ");
+  Serial.println(Slavereceived, BIN);
+  Serial.println("MISO : +");
+  Serial.println(digitalRead(50), BIN); */
   SPI.endTransaction();
 }

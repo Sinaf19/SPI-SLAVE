@@ -1,7 +1,6 @@
 
 // Librairies utilisées
 #include <Arduino.h>
-#include <SPI.h>
 
 // SLAVE code
 // Définition des éléments physiques
@@ -20,7 +19,7 @@ void setup()
 {
   // Setup pour que le SPI fonctionne correctement avec slmt un bouton qui envoie info au master et une led pour dire que l'info du master a bien été reçue
   Serial.begin(9600);
-  SPI.begin();
+  /* SPI.begin(); */
   pinMode(LED, OUTPUT);
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
@@ -34,7 +33,7 @@ void loop()
 
 
     // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
-    SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+    /* SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0)); */
     potValue = analogRead(potentiometer);
     potValue = potValue / 4;
     Slavesend = potValue;
@@ -42,6 +41,6 @@ void loop()
     Serial.println(Slavesend);
     Serial.println(digitalRead(MISO));
 
-    SPI.endTransaction();
+   /*  SPI.endTransaction(); */
 
 }
