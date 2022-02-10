@@ -72,16 +72,16 @@ void setup()
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
-  
+
   pinMode(chipSelect, OUTPUT);
   pinMode(button, INPUT);
   pinMode(LED, OUTPUT);
   pinMode(LEDSwitch1, OUTPUT);
   pinMode(LEDSwitch2, OUTPUT);
   pinMode(SS2, OUTPUT);
-
+  
+  /* digitalWrite(SS, HIGH);
   Serial.print("\nInitializing SD card...");
-  pinMode(SS, OUTPUT);
 
     while (!card.init(SPI_HALF_SPEED, chipSelect)) {
     Serial.println("initialization failed. Things to check:");
@@ -135,7 +135,7 @@ void setup()
   root.openRoot(volume);
   
   // list all files in the card with date and size
-  root.ls(LS_R | LS_DATE | LS_SIZE);
+  root.ls(LS_R | LS_DATE | LS_SIZE); */
 
      pinMode(MISO, INPUT);
     pinMode(SS, OUTPUT); 
@@ -150,16 +150,16 @@ void setup()
   tft.setTextSize(1);
   tft.println("Initialisation");
   // tft.fillScreen(BLACK); 
-
+    digitalWrite(SS, LOW);
 
 
 }
 
 void loop()
 {
-      SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+      SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
     // put your main code here, to run repeatedly:
-
+  Serial.println(digitalRead(SS));
     buttonValue1 = digitalRead(button);
 
     buttonValue3 = digitalRead(button3);
@@ -168,98 +168,24 @@ void loop()
     bool ss1 = digitalRead(SS);
     bool ss2 = digitalRead(SS2); */
 
-    if (buttonValue1 == HIGH and buttonValue2 == HIGH)
-    {
-      x = 0;
-      digitalWrite(LEDSwitch1, LOW);
-      digitalWrite(LEDSwitch2, LOW);
-    }
-    else if (buttonValue1)
+    
+    if (buttonValue1)
     {
       x = 1;
-    }
-    else if (buttonValue3)
-    {
-      x = 3;
-      digitalWrite(LEDSwitch2, HIGH);
-    }
-    else
-    {
+    } else {
+
       x = 0;
-      digitalWrite(LEDSwitch1, LOW);
-      digitalWrite(LEDSwitch2, LOW);
+
     }
 
-    if (buttonValue4 != buttonValue4_Mem)
-    {
-
-      buttonValue4_Mem = buttonValue4;
-      if (buttonValue4 == 1)
-      {
-        chgmtEcran = 1;
-        ecranFlag = true;
-        Serial.println("Temperature");
-      }
-    }
-
-    if (buttonValue4 == 1)
-    {
-      x = 2;
-    }
-
-    if (buttonValue3 != buttonValue3_Mem)
-    {
-
-      buttonValue3_Mem = buttonValue3;
-      if (buttonValue3 == 1)
-      {
-        chgmtEcranh = 1;
-        ecranFlagh = true;
-      }
-    }
-
-    digitalWrite(SS, LOW);
+    
     Mastersend = x;
     Mastereceive = SPI.transfer(Mastersend);
     Serial.print("Mastereceive : ");
     Serial.println(Mastereceive);
     Serial.print("Mastersend : ");
     Serial.println(Mastersend);
-
-    if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
-    {
-      tft.fillScreen(RED);
-      tft.setCursor(5, 55);
-      tft.setTextSize(1);
-      tft.setTextColor(WHITE);
-      tft.print("Temperature : ");
-      Serial.println("Temperature");
-      tft.println(Mastereceive);
-      ecranFlag = false;
-    }
-    else if (chgmtEcran == 0 and ecranFlag == true)
-    {
-      tft.fillScreen(BLACK);
-      ecranFlag = false;
-    }
-
-    if (chgmtEcranh == 1 and ecranFlagh == true and Mastereceive >= 5)
-    {
-      tft.fillScreen(BLUE);
-      tft.setCursor(5, 55);
-      tft.setTextSize(1);
-      tft.setTextColor(WHITE);
-      tft.print("Humidity : ");
-      Serial.println("Humidity");
-      tft.println(Mastereceive);
-      ecranFlagh = false;
-    }
-    else if (chgmtEcranh == 0 and ecranFlagh == true)
-    {
-      tft.fillScreen(BLACK);
-      ecranFlagh = false;
-    }
-
+   
     if (Mastereceive == 85)
     {
       digitalWrite(LED, HIGH);
