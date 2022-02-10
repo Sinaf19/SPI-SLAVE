@@ -37,7 +37,7 @@ void loop()
     potValue = analogRead(potentiometer);
     potValue = potValue / 4;
     Slavesend = potValue;
-    Slavereceived = SPI.transfer(Slavesend);
+   // Slavereceived = SPI.transfer(Slavesend);
     Serial.println(Slavesend);
     Serial.println(digitalRead(MISO));
 
