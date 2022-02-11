@@ -31,13 +31,14 @@ void setup()
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
   pinMode(SS, INPUT_PULLUP);
+  SPCR |= _BV(SPE);
   dht.begin();
 }
 
 void loop()
 {
   // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
-  SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE0));
   buttonValue = digitalRead(button);
 
   // Si le bouton est appuyé envoie 85 au MASTER
@@ -53,7 +54,7 @@ void loop()
   // Envoie des données et réception des data du MASTER
   Slavesend = data;
   Slavereceived = SPI.transfer(Slavesend);
-
+  //Serial.print(Slavesend);
 
   // Si le data du MASTER est de 1 --> allume une LED
   if (Slavereceived == 1)

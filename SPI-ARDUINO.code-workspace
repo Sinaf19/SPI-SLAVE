@@ -14,6 +14,10 @@
 		{
 			"name": "SPI-SECONDSLAVE",
 			"path": "SPI-SECONDSLAVE"
+		},
+		{
+			"name": "SPI-SDCARD",
+			"path": "SPI-SDCARD"
 		}
 	],
 	"settings": {}
