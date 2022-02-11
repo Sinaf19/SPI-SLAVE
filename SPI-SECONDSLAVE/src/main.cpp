@@ -4,7 +4,7 @@
 
 // SLAVE code
 // Définition des éléments physiques
-#define LED 7
+#define LED 8
 #define button 22
 #define button2
 #define potentiometer A7
@@ -36,10 +36,12 @@ void loop()
     /* SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0)); */
     potValue = analogRead(potentiometer);
     potValue = potValue / 4;
-    Slavesend = potValue;
-   // Slavereceived = SPI.transfer(Slavesend);
+   // Serial.println(potValue);
+  //  Slavesend = potValue;
+    //analogWrite(LED,potValue);
+    // Slavereceived = SPI.transfer(Slavesend);
     Serial.println(Slavesend);
-    Serial.println(digitalRead(MISO));
+    Serial.println(digitalRead(MISO)); 
 
    /*  SPI.endTransaction(); */
 
