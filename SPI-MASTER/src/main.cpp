@@ -29,6 +29,10 @@
 #define MAGENTA 0xF81F
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
+#define GOLD 0xA508
+#define BROWN 0x8200
+#define VIOLET 0x9199
+#define SILVER 0xA510
 
 #define LED 7
 #define button 26
@@ -56,6 +60,8 @@ int chgmtEcran;
 int chgmtEcranh;
 bool ecranFlag = true;
 bool ecranFlagh = true;
+bool onScreen = false;
+bool back = false;
 
 Sd2Card card;
 SdVolume volume;
@@ -80,75 +86,133 @@ void setup()
   pinMode(LEDSwitch2, OUTPUT);
   pinMode(SS2, OUTPUT);
 
-
   pinMode(MOSI, OUTPUT);
   pinMode(SS, OUTPUT);
-
-  //  digitalWrite(SS, HIGH);
-  //  digitalWrite(SS2, HIGH);
-  // SPI.setClockDivider(SPI_CLOCK_DIV128);
 
   tft.fillScreen(BLACK);
   tft.setCursor(0, 50);
   tft.setTextColor(WHITE);
   tft.setTextSize(1);
   tft.println("Initialisation");
-  // tft.fillScreen(BLACK);
-  digitalWrite(SS, LOW);
+  tft.fillScreen(BLACK);
+  // digitalWrite(SS, LOW);
 }
 
 void loop()
 {
-
+  buttonValue1 = digitalRead(button);
   buttonValue2 = digitalRead(button2);
+  buttonValue3 = digitalRead(button3);
   buttonValue4 = digitalRead(button4);
 
-    
-    SPI.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE0));
-   
-    digitalWrite(SS, LOW);
-    buttonValue1 = digitalRead(button);
 
-    buttonValue3 = digitalRead(button3);
-    
-    /* int potentiometre = analogRead(pot);
-    bool ss1 = digitalRead(SS);
-    bool ss2 = digitalRead(SS2); */
 
-    if (buttonValue1)
-    {
-      x = 1;
-    }
-    else
-    {
+// Début de la communication
+  SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+  digitalWrite(SS, LOW);
 
-      x = 0;
-    }
+  Mastersend = x;
+  Mastereceive = SPI.transfer(Mastersend);
+  //Serial.println(Mastereceive);
 
-    Mastersend = x;
-    Mastereceive = SPI.transfer(Mastersend);
-  /*Serial.print("Mastereceive : ");
-    Serial.println(Mastereceive);
-    Serial.print("Mastersend : ");
-    Serial.println(Mastersend);  */
+  if (Mastereceive == 85)
+  {
+    digitalWrite(LED, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED, LOW);
+  }
 
-    if (Mastereceive == 85)
-    {
-      digitalWrite(LED, HIGH);
-    }
-    else
-    {
-      digitalWrite(LED, LOW);
-    }
-    
-    SPI.endTransaction();
-    delay(10);
-    
-    
+  SPI.endTransaction();
+
+  // Menu écran OLED et envoie de l'information au slave via la variable X afin de recevoir la température, humidité ou la carte SD
+  if ((ecranFlag || buttonValue4) && !back)
+  {
+    tft.fillScreen(VIOLET);
+    tft.setCursor(0, 20);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(1);
+    tft.println(">Bouton 1:Temperature");
+
+    tft.setCursor(0, 50);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(1);
+    tft.println(">Bouton 2: Humidite");
+
+    tft.setCursor(0, 80);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(1);
+    tft.println(">Bouton 3: Carte SD");
+    ecranFlag = false;
+    onScreen = false;
+    back = true;
+
+    x = 0;
+  }
+  if (buttonValue1 && !onScreen)
+  {
+    tft.fillScreen(RED);
+    tft.setCursor(5, 55);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Temperature : ");
+     tft.println(Mastereceive);
+
+    tft.setCursor(90, 100);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Retour");
+    onScreen = true;
+    back = false;
+
+    // Envoie de l'information a l'esclave pour recevoir la température
+    x = 1;
+  }
+  if (buttonValue2 && !onScreen)
+  {
+    tft.fillScreen(BLUE);
+    tft.setCursor(5, 55);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Humidite : ");
+     tft.println(Mastereceive);
+
+    tft.setCursor(90, 100);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Retour");
+    onScreen = true;
+    back = false;
+
+    // Envoie de l'information a l'esclave pour recevoir la température
+    x = 2;
+  }
+  if (buttonValue3 && !onScreen)
+  {
+    tft.fillScreen(GREEN);
+    tft.setCursor(5, 55);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Envoie d'info de la carte SD");
+
+    tft.setCursor(90, 100);
+    tft.setTextSize(1);
+    tft.setTextColor(WHITE);
+    tft.print("Retour");
+    onScreen = true;
+    back = false;
+
+    // Envoie de l'information a l'esclave pour recevoir la température
+    x = 3;
+  }
+
   
+  delay(10);
+  // Fin de la communication
 }
 
-void buttonFunction()
+/* void buttonFunction()
 {
   buttonValue2 = digitalRead(button2);
 
@@ -164,7 +228,7 @@ void buttonFunction()
   bool ss1 = digitalRead(SS);
   bool ss2 = digitalRead(SS2); */
 
-  if (buttonValue1 == HIGH and buttonValue2 == HIGH)
+  /* if (buttonValue1 == HIGH and buttonValue2 == HIGH)
   {
     x = 0;
     digitalWrite(LEDSwitch1, LOW);
@@ -217,19 +281,19 @@ void buttonFunction()
   digitalWrite(SS, LOW);
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
-/*   Serial.print("Mastereceive : ");
-  Serial.println(Mastereceive);
-  Serial.print("Mastersend : ");
-  Serial.println(Mastersend);
- */
-  if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
+  /*   Serial.print("Mastereceive : ");
+    Serial.println(Mastereceive);
+    Serial.print("Mastersend : ");
+    Serial.println(Mastersend);
+   */
+ /*  if (chgmtEcran == 1 and ecranFlag == true and Mastereceive >= 10)
   {
     tft.fillScreen(RED);
     tft.setCursor(5, 55);
     tft.setTextSize(1);
     tft.setTextColor(WHITE);
     tft.print("Temperature : ");
-    //Serial.println("Temperature");
+    // Serial.println("Temperature");
     tft.println(Mastereceive);
     ecranFlag = false;
   }
@@ -246,7 +310,7 @@ void buttonFunction()
     tft.setTextSize(1);
     tft.setTextColor(WHITE);
     tft.print("Humidity : ");
-  //  Serial.println("Humidity");
+    //  Serial.println("Humidity");
     tft.println(Mastereceive);
     ecranFlagh = false;
   }
@@ -283,4 +347,4 @@ void buttonFunction()
 
       SPI.endTransaction();
     } */
-}
+}  
