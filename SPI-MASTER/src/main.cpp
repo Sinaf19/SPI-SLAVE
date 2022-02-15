@@ -100,7 +100,7 @@ void setup()
   tft.setTextSize(1);
   tft.println("Initialisation");
   tft.fillScreen(BLACK);
-  // digitalWrite(SS, LOW);
+   digitalWrite(SS, LOW);
 }
 
 void loop()
@@ -118,11 +118,10 @@ void loop()
   }
   
 
-  //Serial.println(rafraichissement);
 
   // Début de la communication
-  SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
-  digitalWrite(SS, LOW);
+  SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
+  //digitalWrite(SS, LOW);
 
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
@@ -138,6 +137,7 @@ void loop()
   }
 
   SPI.endTransaction();
+  delay(10);
   // Fin de la communication
 
   // Menu écran OLED et envoie de l'information au slave via la variable X afin de recevoir la température, humidité ou la carte SD
@@ -234,6 +234,5 @@ void loop()
     // Envoie de l'information a l'esclave pour recevoir.... la carte SD
     x = 3;
   }
-
-  delay(10);
+  
 }
