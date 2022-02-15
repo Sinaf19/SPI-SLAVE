@@ -56,8 +56,8 @@ int buttonValue3;
 int buttonValue4;
 int buttonValue4_Mem;
 int buttonValue3_Mem;
-int ecranT;
-int ecranH;
+int ecranT = false;
+int ecranH = false;
 bool ecranFlagT = true;
 bool ecranFlagH = true;
 bool ecranFlag = true;
@@ -65,7 +65,7 @@ bool onScreen = false;
 bool back = false;
 
 bool rafraichissement = false;
-unsigned long interval = 2000;
+unsigned long interval = 500;
 unsigned long rafraichissement_Millis = 0;
 
 Sd2Card card;
@@ -136,8 +136,7 @@ void loop()
     digitalWrite(LED, LOW);
   }
 
-  SPI.endTransaction();
-  delay(10);
+
   // Fin de la communication
 
   // Menu écran OLED et envoie de l'information au slave via la variable X afin de recevoir la température, humidité ou la carte SD
@@ -182,17 +181,17 @@ void loop()
     tft.print("Retour");
     onScreen = true;
     back = false;
-    ecranH = true;
+    ecranT = true;
 
     // Envoie de l'information a l'esclave pour recevoir la température
     x = 1;
   }
-      if (rafraichissement and ecranH)
+      if (rafraichissement and ecranT)
     {
-      tft.fillRect(89, 55, 11, 7, RED);
+    //  tft.fillRect(89, 55, 11, 7, RED);
       tft.setCursor(89, 55);
       tft.setTextSize(1);
-      tft.setTextColor(WHITE);
+      tft.setTextColor(WHITE, RED);
       tft.print(Mastereceive);
     }
   
@@ -205,6 +204,8 @@ void loop()
     tft.setTextColor(WHITE);
     tft.print("Humidite : ");
     tft.println(Mastereceive);
+    tft.setCursor(85, 55);
+    tft.print("%");
 
     tft.setCursor(90, 100);
     tft.setTextSize(1);
@@ -212,10 +213,23 @@ void loop()
     tft.print("Retour");
     onScreen = true;
     back = false;
-
+    ecranH = true;
     // Envoie de l'information a l'esclave pour recevoir l'humiditö
     x = 2;
   }
+
+    if (rafraichissement and ecranH)
+    {
+    //  tft.fillRect(70, 55, 13, 7, BLUE);
+      tft.setCursor(70, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE, BLUE);
+      tft.print(Mastereceive);
+      
+    }
+  
+
+
   if (buttonValue3 && !onScreen)
   {
     tft.fillScreen(GREEN);
@@ -235,4 +249,7 @@ void loop()
     x = 3;
   }
   
+  SPI.endTransaction();
+  delay(10);
+
 }

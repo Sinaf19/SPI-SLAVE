@@ -63,7 +63,7 @@ void loop()
   /*   Serial.print(Slavesend); */
 
   // Si le data du MASTER est de 1 --> allume une LED
-  Serial.print(Slavereceived);
+  
   if (Slavereceived == 0)
   {
     digitalWrite(LEDR, LOW);
@@ -109,6 +109,7 @@ void loop()
     //  Serial.println(datat);
     } else {
       datat = 0;
+      temperature = 0;
     }
     
 
@@ -130,6 +131,7 @@ void loop()
     else
     {
       datah = 0;
+      humidity = 0;
     }
 
     // Envoie l'humiodité
