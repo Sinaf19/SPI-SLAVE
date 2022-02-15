@@ -35,7 +35,7 @@ void setup()
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
   pinMode(SS, INPUT_PULLUP);
-  SPCR |= _BV(SPE);
+  //SPCR |= _BV(SPE);
   dht.begin();
 }
 
@@ -88,13 +88,10 @@ void loop()
     if (Slavereceived == 1)
     {
       datat = dht.readTemperature();
-      Serial.print("Température :");
-      Serial.println(datat);
+      //Serial.print("Température :");
+      //Serial.println(datat);
     }
-    else
-    {
-      datat = 0;
-    }
+    
 
     // Envoie la température
     if (datat != 0)
@@ -106,19 +103,16 @@ void loop()
     if (Slavereceived == 2)
     {
       datah = dht.readHumidity();
-      Serial.print("Humidité :");
-      Serial.println(datah);
+      //Serial.print("Humidité :");
+      //Serial.println(datah);
     }
-    else
-    {
-      datah = 0;
-    }
+
     // Envoie l'humiodité
     if (datah != 0)
     {
       Slavesend = datah;
       Slavereceived = SPI.transfer(Slavesend);
     }
-
+  Serial.print(digitalRead(MISO));
   SPI.endTransaction();
 }

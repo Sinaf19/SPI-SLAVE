@@ -56,10 +56,11 @@ int buttonValue3;
 int buttonValue4;
 int buttonValue4_Mem;
 int buttonValue3_Mem;
-int chgmtEcran;
-int chgmtEcranh;
+int ecranT;
+int ecranH;
+bool ecranFlagT = true;
+bool ecranFlagH = true;
 bool ecranFlag = true;
-bool ecranFlagh = true;
 bool onScreen = false;
 bool back = false;
 
@@ -115,8 +116,9 @@ void loop()
     rafraichissement_Millis = currentMillis;
     rafraichissement = !rafraichissement;
   }
+  
 
-  Serial.println(rafraichissement);
+  //Serial.println(rafraichissement);
 
   // Début de la communication
   SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
@@ -159,10 +161,12 @@ void loop()
     ecranFlag = false;
     onScreen = false;
     back = true;
+    ecranH = false;
+    ecranT = false;
 
     x = 0;
   }
-  if (buttonValue1 && !onScreenc)
+  if (buttonValue1 && !onScreen)
   {
     tft.fillScreen(RED);
     tft.setCursor(5, 55);
@@ -171,14 +175,6 @@ void loop()
     tft.print("Temperature : ");
     tft.println(Mastereceive);
 
-    if (rafraichissement)
-    {
-      tft.fillRect(89, 55, 5, 7, RED);
-      tft.setCursor(89, 55);
-      tft.setTextSize(1);
-      tft.setTextColor(WHITE);
-      tft.print(Mastereceive);
-    }
 
     tft.setCursor(90, 100);
     tft.setTextSize(1);
@@ -186,10 +182,21 @@ void loop()
     tft.print("Retour");
     onScreen = true;
     back = false;
+    ecranH = true;
 
     // Envoie de l'information a l'esclave pour recevoir la température
     x = 1;
   }
+      if (rafraichissement and ecranH)
+    {
+      tft.fillRect(89, 55, 11, 7, RED);
+      tft.setCursor(89, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print(Mastereceive);
+    }
+  
+
   if (buttonValue2 && !onScreen)
   {
     tft.fillScreen(BLUE);
