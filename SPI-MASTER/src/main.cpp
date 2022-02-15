@@ -116,7 +116,7 @@ void loop()
     rafraichissement = !rafraichissement;
   }
 
-  Serial.println(rafraichissement);
+ // Serial.println(rafraichissement);
 
   // Début de la communication
   SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
@@ -179,6 +179,7 @@ void loop()
       tft.setTextSize(1);
       tft.setTextColor(WHITE);
       tft.print(Mastereceive);
+      Serial.print("in the matrix");
     }
 
     tft.setCursor(90, 100);
