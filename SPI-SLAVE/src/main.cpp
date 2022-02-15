@@ -23,6 +23,8 @@ int data;
 int datat;
 int datah;
 int humidity;
+int temperature;
+
 
 void setup()
 {
@@ -35,18 +37,18 @@ void setup()
   pinMode(button, INPUT);
   pinMode(MISO, OUTPUT);
   pinMode(SS, INPUT_PULLUP);
-  SPCR |= _BV(SPE);
+//  SPCR |= _BV(SPE);
   dht.begin();
 }
 
 void loop()
 {
   // Reçoit et update la valeur pour envoyer au MASTER et allumer ou éteindre la LED pour informer de la bonne réception des données
-  SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
   buttonValue = digitalRead(button);
-
+  Slavereceived = SPI.transfer(Slavesend);
   // Si le bouton est appuyé envoie 85 au MASTER
-  if (buttonValue)
+/*   if (buttonValue)
   {
     data = 85;
     //  Serial.println(data);
@@ -57,57 +59,72 @@ void loop()
   }
   // Envoie des données et réception des data du MASTER
   Slavesend = data;
-  Slavereceived = SPI.transfer(Slavesend);
+  Slavereceived = SPI.transfer(Slavesend); */
   /*   Serial.print(Slavesend); */
 
   // Si le data du MASTER est de 1 --> allume une LED
+  Serial.print(Slavereceived);
   if (Slavereceived == 0)
   {
     digitalWrite(LEDR, LOW);
     digitalWrite(LEDV, LOW);
     digitalWrite(LEDB, LOW);
-  }
+    datat = 0;
+    datah = 0;
+    temperature = false;
+    humidity = false;
+  } 
   if (Slavereceived == 1)
   {
     digitalWrite(LEDR, HIGH);
-
+    digitalWrite(LEDB, LOW);
+    digitalWrite(LEDV, LOW);
+    temperature = true;
+    humidity = false;
+    
   }
   else if (Slavereceived == 2)
   {
     digitalWrite(LEDB, HIGH);
+    digitalWrite(LEDR, LOW);
+    digitalWrite(LEDV, LOW);
+    temperature = false;
+    humidity = true;
   }
   else if (Slavereceived == 3)
   {
     digitalWrite(LEDV, HIGH);
+    digitalWrite(LEDR, LOW);
+    digitalWrite(LEDB, LOW);
   }
 
 
   // Serial.print(Slavereceived);
-
+  
     // Si reçoit un 2 du MASTER envoie la température
-    if (Slavereceived == 1)
+    if (temperature)
     {
       datat = dht.readTemperature();
-      Serial.print("Température :");
-      Serial.println(datat);
-    }
-    else
-    {
+    //  Serial.print("Température :");
+    //  Serial.println(datat);
+    } else {
       datat = 0;
     }
 
+    
     // Envoie la température
     if (datat != 0)
     {
       Slavesend = datat;
-      Slavereceived = SPI.transfer(Slavesend);
+      SPI.transfer(Slavesend);
+      
     }
     // Si reçoit 3 du MASTER envoie l'humidité
-    if (Slavereceived == 2)
+     if (humidity)
     {
       datah = dht.readHumidity();
-      Serial.print("Humidité :");
-      Serial.println(datah);
+     // Serial.print("Humidité :");
+     // Serial.println(datah);
     }
     else
     {
@@ -117,8 +134,11 @@ void loop()
     if (datah != 0)
     {
       Slavesend = datah;
-      Slavereceived = SPI.transfer(Slavesend);
+      SPI.transfer(Slavesend);
     }
-
+   
+  
   SPI.endTransaction();
+  delay(10);
+  
 }
