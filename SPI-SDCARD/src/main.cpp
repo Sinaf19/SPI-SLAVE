@@ -11,19 +11,20 @@ File myFile;
 //     Arduino Ethernet shield: pin 4
 //     Adafruit SD shields and modules: pin 10
 //     Sparkfun SD shield: pin 8
-const int chipSelect = 53;
+const int chipSelect = 22;
 
 void setup()
 {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
   Serial.print("Initializing SD card...");
+  pinMode(SS, OUTPUT);
   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
   // Note that even if it's not used as the CS pin, the hardware SS pin 
   // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
   // or the SD library functions will not work. 
-   pinMode(SS, OUTPUT);
-   pinMode(SS, LOW);
+  pinMode(chipSelect, OUTPUT);
+  digitalWrite(chipSelect, LOW);
   if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed!");
     return;
@@ -33,18 +34,6 @@ void setup()
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   myFile = SD.open("test.txt", FILE_WRITE);
-  
-  // if the file opened okay, write to it:
-  if (myFile) {
-    Serial.print("Writing to test.txt...");
-    myFile.println("Hello, it's me, I've been wondering if after all these years you'd like to meet. ");
-	// close the file:
-    myFile.close();
-    Serial.println("done.");
-  } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
-  }
   
   // re-open the file for reading:
   myFile = SD.open("test.txt");

@@ -42,8 +42,10 @@
 #define LEDSwitch1 3
 #define LEDSwitch2 4
 #define BlueLED A4
+#define chipSelect 22
 
 void buttonFunction();
+void SDRead();
 
 volatile byte Mastersend;
 volatile byte Mastereceive;
@@ -63,6 +65,9 @@ bool ecranFlagH = true;
 bool ecranFlag = true;
 bool onScreen = false;
 bool back = false;
+bool SDFlag = false;
+bool otherSPI = true;
+unsigned long texte;
 
 bool rafraichissement = false;
 unsigned long interval = 500;
@@ -71,7 +76,7 @@ unsigned long rafraichissement_Millis = 0;
 Sd2Card card;
 SdVolume volume;
 SdFile root;
-const int chipSelect = 10;
+File myFile;
 
 Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
 // Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
@@ -83,6 +88,7 @@ void setup()
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
+  SD.begin(22);
 
   pinMode(chipSelect, OUTPUT);
   pinMode(button, INPUT);
@@ -100,7 +106,8 @@ void setup()
   tft.setTextSize(1);
   tft.println("Initialisation");
   tft.fillScreen(BLACK);
-   digitalWrite(SS, LOW);
+  digitalWrite(SS, HIGH);
+  digitalWrite(chipSelect, HIGH);
 }
 
 void loop()
@@ -109,7 +116,7 @@ void loop()
   buttonValue2 = digitalRead(button2);
   buttonValue3 = digitalRead(button3);
   buttonValue4 = digitalRead(button4);
-
+  
   unsigned long currentMillis = millis();
   if (currentMillis - rafraichissement_Millis >= interval)
   {
@@ -120,14 +127,18 @@ void loop()
 
 
   // Début de la communication
+
+  if (otherSPI){
+    delay(100);
   SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
-  //digitalWrite(SS, LOW);
+
+  digitalWrite(SS, LOW);
 
   Mastersend = x;
   Mastereceive = SPI.transfer(Mastersend);
   // Serial.println(Mastereceive);
 
-  if (Mastereceive == 85)
+/*   if (Mastereceive == 85)
   {
     digitalWrite(LED, HIGH);
   }
@@ -135,7 +146,7 @@ void loop()
   {
     digitalWrite(LED, LOW);
   }
-
+ */
 
   // Fin de la communication
 
@@ -186,7 +197,7 @@ void loop()
     // Envoie de l'information a l'esclave pour recevoir la température
     x = 1;
   }
-      if (rafraichissement and ecranT)
+      if (rafraichissement and ecranT && Mastereceive > 0)
     {
     //  tft.fillRect(89, 55, 11, 7, RED);
       tft.setCursor(89, 55);
@@ -218,7 +229,7 @@ void loop()
     x = 2;
   }
 
-    if (rafraichissement and ecranH)
+    if (rafraichissement and ecranH && Mastereceive > 0)
     {
     //  tft.fillRect(70, 55, 13, 7, BLUE);
       tft.setCursor(70, 55);
@@ -244,12 +255,67 @@ void loop()
     tft.print("Retour");
     onScreen = true;
     back = false;
-
+    SDFlag = true;
+    otherSPI = false;
     // Envoie de l'information a l'esclave pour recevoir.... la carte SD
-    x = 3;
+   // x = 3;
   }
   
   SPI.endTransaction();
   delay(10);
+  }
+if (SDFlag){
+  
+  digitalWrite(SS, HIGH);
+  Serial.print(digitalRead(SS));
+ // delay(100);
+  SDRead();
+  Serial.print(texte);
+  digitalWrite(chipSelect, HIGH);
+  SDFlag = false;
+  
+};
+ 
 
 }
+
+
+void SDRead () {
+
+/* 
+SD.begin(chipSelect); */
+
+digitalWrite(chipSelect, LOW);
+
+/*  if (!SD.begin(chipSelect)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done."); */
+  
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  myFile = SD.open("test.txt", FILE_WRITE);
+  
+  // re-open the file for reading:
+  myFile = SD.open("test.txt");
+  if (myFile) {
+    
+    
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+    Serial.write(myFile.read());
+    }
+    // close the file:
+    myFile.close();
+  } else {
+  	// if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+
+delay(1000);  
+otherSPI = true;
+
+};
+
+
