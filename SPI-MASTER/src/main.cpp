@@ -4,8 +4,9 @@
 #include <Adafruit_SSD1351.h>
 #include <Wire.h>
 #include <Adafruit_BusIO_Register.h>
-#include <SD.h>
+#include <SdFat.h>
 
+SdFat SD;
 // MASTER Arduino
 
 // Screen dimensions
@@ -74,7 +75,7 @@ unsigned long interval = 500;
 unsigned long rafraichissement_Millis = 0;
 
 Sd2Card card;
-SdVolume volume;
+FatVolume volume;
 SdFile root;
 File myFile;
 
@@ -84,11 +85,11 @@ Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_
 void setup()
 {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
-  SD.begin(22);
+ // SD.begin(chipSelect);
 
   pinMode(chipSelect, OUTPUT);
   pinMode(button, INPUT);
@@ -173,6 +174,7 @@ void loop()
     back = true;
     ecranH = false;
     ecranT = false;
+    digitalWrite(SS, HIGH);
 
     x = 0;
   }
@@ -255,26 +257,31 @@ void loop()
     tft.print("Retour");
     onScreen = true;
     back = false;
+      digitalWrite(SS, HIGH);
+     SPI.endTransaction();
+     otherSPI = false;
     SDFlag = true;
-    otherSPI = false;
+    
     // Envoie de l'information a l'esclave pour recevoir.... la carte SD
    // x = 3;
   }
   
-  SPI.endTransaction();
-  delay(10);
-  }
-if (SDFlag){
+  SPI.end();
   
-  digitalWrite(SS, HIGH);
-  Serial.print(digitalRead(SS));
+  }
+
+  if (SDFlag){
+  
+
+  Serial.println(digitalRead(SS));
  // delay(100);
   SDRead();
-  Serial.print(texte);
   digitalWrite(chipSelect, HIGH);
+  otherSPI = true;
   SDFlag = false;
   
-};
+}
+
  
 
 }
@@ -282,8 +289,9 @@ if (SDFlag){
 
 void SDRead () {
 
-/* 
-SD.begin(chipSelect); */
+
+SD.begin(chipSelect); 
+
 
 digitalWrite(chipSelect, LOW);
 
@@ -293,14 +301,13 @@ digitalWrite(chipSelect, LOW);
   }
   Serial.println("initialization done."); */
   
-  // open the file. note that only one file can be open at a time,
+ /*  // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  myFile = SD.open("test.txt", FILE_WRITE);
-  
+  myFile = SD.open("test.txt", FILE_READ);
+   */
   // re-open the file for reading:
   myFile = SD.open("test.txt");
   if (myFile) {
-    
     
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
@@ -313,9 +320,8 @@ digitalWrite(chipSelect, LOW);
     Serial.println("error opening test.txt");
   }
 
-delay(1000);  
-otherSPI = true;
 
-};
+
+}
 
 
