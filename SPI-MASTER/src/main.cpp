@@ -4,8 +4,9 @@
 #include <Adafruit_SSD1351.h>
 #include <Wire.h>
 #include <Adafruit_BusIO_Register.h>
-#include <SD.h>
+#include <SdFat.h>
 
+SdFat SD;
 // MASTER Arduino
 
 // Screen dimensions
@@ -74,7 +75,7 @@ unsigned long interval = 500;
 unsigned long rafraichissement_Millis = 0;
 
 Sd2Card card;
-SdVolume volume;
+FatVolume volume;
 SdFile root;
 File myFile;
 
@@ -88,7 +89,7 @@ void setup()
   SPI.begin();
   tft.begin();
   tft.setRotation(1);
-  SD.begin(22);
+  // SD.begin(chipSelect);
 
   pinMode(chipSelect, OUTPUT);
   pinMode(button, INPUT);
@@ -116,206 +117,200 @@ void loop()
   buttonValue2 = digitalRead(button2);
   buttonValue3 = digitalRead(button3);
   buttonValue4 = digitalRead(button4);
-  
+
   unsigned long currentMillis = millis();
   if (currentMillis - rafraichissement_Millis >= interval)
   {
     rafraichissement_Millis = currentMillis;
     rafraichissement = !rafraichissement;
   }
-  
-
 
   // Début de la communication
 
-  if (otherSPI){
-    delay(100);
-  SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
-
-  digitalWrite(SS, LOW);
-
-  Mastersend = x;
-  Mastereceive = SPI.transfer(Mastersend);
-  // Serial.println(Mastereceive);
-
-/*   if (Mastereceive == 85)
+  if (otherSPI)
   {
-    digitalWrite(LED, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED, LOW);
-  }
- */
+   // delay(100);
+    SPI.beginTransaction(SPISettings(9600, MSBFIRST, SPI_MODE0));
 
-  // Fin de la communication
+    digitalWrite(SS, LOW);
 
-  // Menu écran OLED et envoie de l'information au slave via la variable X afin de recevoir la température, humidité ou la carte SD
-  if ((ecranFlag || buttonValue4) && !back)
-  {
-    tft.fillScreen(VIOLET);
-    tft.setCursor(0, 20);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(1);
-    tft.println(">Bouton 1:Temperature");
+    Mastersend = x;
+    Mastereceive = SPI.transfer(Mastersend);
+    // Serial.println(Mastereceive);
 
-    tft.setCursor(0, 50);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(1);
-    tft.println(">Bouton 2: Humidite");
+    /*   if (Mastereceive == 85)
+      {
+        digitalWrite(LED, HIGH);
+      }
+      else
+      {
+        digitalWrite(LED, LOW);
+      }
+     */
 
-    tft.setCursor(0, 80);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(1);
-    tft.println(">Bouton 3: Carte SD");
-    ecranFlag = false;
-    onScreen = false;
-    back = true;
-    ecranH = false;
-    ecranT = false;
+    // Fin de la communication
 
-    x = 0;
-  }
-  if (buttonValue1 && !onScreen)
-  {
-    tft.fillScreen(RED);
-    tft.setCursor(5, 55);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Temperature : ");
-    tft.println(Mastereceive);
-
-
-    tft.setCursor(90, 100);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Retour");
-    onScreen = true;
-    back = false;
-    ecranT = true;
-
-    // Envoie de l'information a l'esclave pour recevoir la température
-    x = 1;
-  }
-      if (rafraichissement and ecranT && Mastereceive > 0)
+    // Menu écran OLED et envoie de l'information au slave via la variable X afin de recevoir la température, humidité ou la carte SD
+    if ((ecranFlag || buttonValue4) && !back)
     {
-    //  tft.fillRect(89, 55, 11, 7, RED);
+      tft.fillScreen(VIOLET);
+      tft.setCursor(0, 20);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(1);
+      tft.println(">Bouton 1:Temperature");
+
+      tft.setCursor(0, 50);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(1);
+      tft.println(">Bouton 2: Humidite");
+
+      tft.setCursor(0, 80);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(1);
+      tft.println(">Bouton 3: Carte SD");
+      ecranFlag = false;
+      onScreen = false;
+      back = true;
+      ecranH = false;
+      ecranT = false;
+     // digitalWrite(SS, HIGH);
+
+      x = 0;
+    }
+    if (buttonValue1 && !onScreen)
+    {
+      tft.fillScreen(RED);
+      tft.setCursor(5, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Temperature : ");
+      tft.println(Mastereceive);
+
+      tft.setCursor(90, 100);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Retour");
+      onScreen = true;
+      back = false;
+      ecranT = true;
+
+      // Envoie de l'information a l'esclave pour recevoir la température
+      x = 1;
+    }
+    if (rafraichissement and ecranT && Mastereceive > 0)
+    {
+      //  tft.fillRect(89, 55, 11, 7, RED);
       tft.setCursor(89, 55);
       tft.setTextSize(1);
       tft.setTextColor(WHITE, RED);
       tft.print(Mastereceive);
     }
-  
 
-  if (buttonValue2 && !onScreen)
-  {
-    tft.fillScreen(BLUE);
-    tft.setCursor(5, 55);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Humidite : ");
-    tft.println(Mastereceive);
-    tft.setCursor(85, 55);
-    tft.print("%");
+    if (buttonValue2 && !onScreen)
+    {
+      tft.fillScreen(BLUE);
+      tft.setCursor(5, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Humidite : ");
+      tft.println(Mastereceive);
+      tft.setCursor(85, 55);
+      tft.print("%");
 
-    tft.setCursor(90, 100);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Retour");
-    onScreen = true;
-    back = false;
-    ecranH = true;
-    // Envoie de l'information a l'esclave pour recevoir l'humiditö
-    x = 2;
-  }
+      tft.setCursor(90, 100);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Retour");
+      onScreen = true;
+      back = false;
+      ecranH = true;
+      // Envoie de l'information a l'esclave pour recevoir l'humiditö
+      x = 2;
+    }
 
     if (rafraichissement and ecranH && Mastereceive > 0)
     {
-    //  tft.fillRect(70, 55, 13, 7, BLUE);
+      //  tft.fillRect(70, 55, 13, 7, BLUE);
       tft.setCursor(70, 55);
       tft.setTextSize(1);
       tft.setTextColor(WHITE, BLUE);
       tft.print(Mastereceive);
-      
     }
-  
 
+    if (buttonValue3 && !onScreen)
+    {
+      tft.fillScreen(GREEN);
+      tft.setCursor(5, 55);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Envoie d'info de la carte SD");
 
-  if (buttonValue3 && !onScreen)
+      tft.setCursor(90, 100);
+      tft.setTextSize(1);
+      tft.setTextColor(WHITE);
+      tft.print("Retour");
+      onScreen = true;
+      back = false;
+
+      // SPI.endTransaction();
+      otherSPI = false;
+      SDFlag = true;
+
+      // Envoie de l'information a l'esclave pour recevoir.... la carte SD
+      // x = 3;
+    }
+
+    SPI.endTransaction();
+    // SPI.end();
+    delay(10);
+  }
+
+  if (SDFlag)
   {
-    tft.fillScreen(GREEN);
-    tft.setCursor(5, 55);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Envoie d'info de la carte SD");
 
-    tft.setCursor(90, 100);
-    tft.setTextSize(1);
-    tft.setTextColor(WHITE);
-    tft.print("Retour");
-    onScreen = true;
-    back = false;
-    SDFlag = true;
-    otherSPI = false;
-    // Envoie de l'information a l'esclave pour recevoir.... la carte SD
-   // x = 3;
+    digitalWrite(SS, HIGH);
+    // Serial.println(digitalRead(SS));
+    // delay(100);
+    SDRead();
+    digitalWrite(chipSelect, HIGH);
+    otherSPI = true;
+    SDFlag = false;
   }
-  
-  SPI.endTransaction();
-  delay(10);
-  }
-if (SDFlag){
-  
-  digitalWrite(SS, HIGH);
-  Serial.print(digitalRead(SS));
- // delay(100);
-  SDRead();
-  Serial.print(texte);
-  digitalWrite(chipSelect, HIGH);
-  SDFlag = false;
-  
-};
- 
-
 }
 
+void SDRead()
+{
 
-void SDRead () {
+  SD.begin(chipSelect);
 
-/* 
-SD.begin(chipSelect); */
+  digitalWrite(chipSelect, LOW);
 
-digitalWrite(chipSelect, LOW);
+  /*  if (!SD.begin(chipSelect)) {
+      Serial.println("initialization failed!");
+      return;
+    }
+    Serial.println("initialization done."); */
 
-/*  if (!SD.begin(chipSelect)) {
-    Serial.println("initialization failed!");
-    return;
-  }
-  Serial.println("initialization done."); */
-  
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  myFile = SD.open("test.txt", FILE_WRITE);
-  
+  /*  // open the file. note that only one file can be open at a time,
+   // so you have to close this one before opening another.
+   myFile = SD.open("test.txt", FILE_READ);
+    */
   // re-open the file for reading:
   myFile = SD.open("test.txt");
-  if (myFile) {
-    
-    
+  if (myFile)
+  {
+
     // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-    Serial.write(myFile.read());
+    while (myFile.available())
+    {
+      Serial.write(myFile.read());
     }
     // close the file:
     myFile.close();
-  } else {
-  	// if the file didn't open, print an error:
+  }
+  else
+  {
+    // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
   }
-
-delay(1000);  
-otherSPI = true;
-
-};
-
-
+}
